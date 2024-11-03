@@ -173,7 +173,7 @@ def add_white_border_with_text(image_path, output_path=None):
     add_device_info(image, draw, exif_data, border_height, logo_width)
 
     # 保存带有边框和文本的图像
-    image_with_border.save(output_path)
+    image_with_border.save(output_path, quality=100)
     print(f"带边框图片已保存至：{output_path}")
 
 def main(image_path, output_path=None):
