@@ -179,6 +179,8 @@ def add_white_border_with_text(image_path, output_path=None):
 def main(image_path, output_path=None):
     if os.path.isdir(image_path):
         for picture in os.listdir(image_path):
+            if not (picture.endswith(".jpg") or picture.endswith(".png")):
+                continue
             main(os.path.join(image_path, picture), output_path=None)
     elif os.path.isfile(image_path):
         if output_path is None:
@@ -191,4 +193,4 @@ def main(image_path, output_path=None):
         raise FileNotFoundError
 
 if __name__ == "__main__":
-    main("/Users/wangqi/Desktop/2.35/P1056514.jpg")
+    main("/Users/wangqi/Desktop/2.35")
