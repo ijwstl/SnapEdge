@@ -4,8 +4,10 @@ const path = require("path");
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1200,
+    height: 700,
+    minWidth: 1200,   // 设置最小宽度
+    minHeight: 700,  // 设置最小高度
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true, // 必须开启，确保使用 contextBridge
@@ -14,14 +16,12 @@ function createWindow() {
     },
   });
 
-  // 加载 Vue 应用
-  console.log(process.env.NODE_ENV);
   if (process.env.NODE_ENV == "production") {
     // 生产环境逻辑
     win.loadFile(path.join(__dirname, "../dist/index.html"));
   } else {
     // 开发环境逻辑
-    win.loadURL("http://localhost:8080");
+    win.loadURL("http://localhost:5173");
   }
 }
 

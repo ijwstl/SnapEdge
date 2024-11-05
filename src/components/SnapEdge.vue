@@ -1,50 +1,44 @@
 <template>
-  <n-config-provider>
-    <n-space vertical>
-      <n-layout has-sider sider-placement="right">
-        <n-layout-content content-style="padding: 24px;">
-          <div v-if="imageSrc" :style="imageContainerStyle">
-            <img :src="imageSrc" :style="imageStyle" />
-          </div>
-        </n-layout-content>
-        <n-layout-sider
-          collapse-mode="transform"
-          :collapsed-width="10"
-          :width="240"
-          :native-scrollbar="false"
-          show-trigger="bar"
-          content-style="padding: 24px;"
-          bordered
-        >
-          <n-button type="primary" @click="selectImage">选择 JPG 图片</n-button>
-          <n-slider
-            v-model:value="borderWidth"
-            :max="50"
-            :min="0"
-            step="1"
-            label="边框宽度"
-            style="width: 300px"
+  <el-row :gutter="20">
+    <el-col :span="20">
+      <el-card>
+        <div class="thumbnail-container">
+          <img
+            :src="imageSrc"
+            alt="Thumbnail"
+            class="thumbnail"
+            @click="openPreview"
           />
-        </n-layout-sider>
-      </n-layout>
-    </n-space>
-  </n-config-provider>
+        </div>
+        <image-preview
+          :imageSrc="imageSrc"
+          :showPreview="isPreviewVisible"
+          :onClose="closePreview"
+        />
+      </el-card>
+    </el-col>
+    <el-col :span="4">
+      <el-card style="max-width: 480px">
+        <template #header>
+          <div class="card-header">
+            <span>配置</span>
+          </div>
+        </template>
+        <el-button type="primary" @click="selectImage">选择 JPG 图片</el-button>
+        <edit-config></edit-config>
+      </el-card>
+    </el-col>
+  </el-row>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import {
-  NButton,
-  NConfigProvider,
-  NSlider,
-  NSpace,
-  NLayout,
-  NLayoutContent,
-  NLayoutSider,
-} from "naive-ui";
+import { ref } from "vue";
+import ImagePreview from "./ImagePreview.vue";
+import EditConfig from "./EditConfig.vue";
 
 const imageSrc = ref(null);
-const borderWidth = ref(10);
+const isPreviewVisible = ref(false);
+// const borderWidth = ref(10);
 
 const selectImage = async () => {
   const filePath = await window.electronAPI.selectImageFile();
@@ -55,26 +49,28 @@ const selectImage = async () => {
   }
 };
 
-const imageContainerStyle = computed(() => ({
-  padding: `${borderWidth.value}px`,
-  backgroundColor: "white",
-  display: "inline-block",
-  borderRadius: "4px",
-  boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-}));
+const openPreview = () => {
+  isPreviewVisible.value = true;
+};
 
-const imageStyle = {
-  width: "100%",
-  height: "auto",
+const closePreview = () => {
+  isPreviewVisible.value = false;
 };
 </script>
 
 <style scoped>
-.n-layout-sider {
-  background: rgba(128, 128, 128, 0.3);
+.thumbnail-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc; /* 可选：添加边框以更好地看到容器 */
 }
 
-.n-layout-content {
-  background: rgba(128, 128, 128, 0.4);
+.thumbnail {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 </style>
