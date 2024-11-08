@@ -129,6 +129,7 @@ func resizeImage(img image.Image, width, height int) image.Image {
 }
 
 func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
+	fmt.Println("处理图片: ", imgPath)
 	basePath, _ := os.Getwd()
 	imgFile, err := os.Open(imgPath)
 	if err != nil {
@@ -407,7 +408,7 @@ func main() {
 		fmt.Println("Error reading config:", err)
 	}
 
-	fmt.Println(config)
+	fmt.Println("Config info:", config)
 
 	if err := addWhiteBorderWithTextWrapper(config.ImagePath, config.OutputPath, config); err != nil {
 		fmt.Println("Error:", err)
