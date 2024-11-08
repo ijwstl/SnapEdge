@@ -211,7 +211,7 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 
 		var lowerRightTextFont string
 		if lowerRightConfig.FontPath == "default" {
-			lowerRightTextFont = path.Join(basePath, "font", "NewYork.ttf")
+			lowerRightTextFont = path.Join(basePath, "font", "SFCamera.ttf")
 		} else {
 			lowerRightTextFont = lowerRightConfig.FontPath
 		}
