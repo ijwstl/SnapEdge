@@ -12,7 +12,9 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -26,7 +28,7 @@ func getExifData(imgPath string) (map[string]interface{}, error) {
 	defer file.Close()
 
 	x, err := exif.Decode(file)
-	fmt.Println(x)
+
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +105,7 @@ func resizeImage(img image.Image, width, height int) image.Image {
 func addWhiteBorderWithText(imgPath, outputPath string) error {
 	basePath, _ := os.Getwd()
 	SFCompactItalicFontPath := path.Join(basePath, "font", "SFCompactItalic.ttf")
-	NewYorkFontPath := path.Join(basePath, "font", "NewYork.ttf")
+	NewYorkFontPath := path.Join(basePath, "font", "SFCamera.ttf")
 	imgFile, err := os.Open(imgPath)
 	if err != nil {
 		return err
@@ -117,6 +119,7 @@ func addWhiteBorderWithText(imgPath, outputPath string) error {
 
 	exifData, err := getExifData(imgPath)
 	if err != nil {
+		fmt.Println("Get exif info error:", err)
 		return err
 	}
 
@@ -134,12 +137,12 @@ func addWhiteBorderWithText(imgPath, outputPath string) error {
 	// 添加曝光信息
 	focalLength, fNumber, exposureTime, iso := exifData["FocalLength"].(string), exifData["FNumber"].(string), exifData["ExposureTime"].(string), exifData["ISOSpeedRatings"].(string)
 	exposeInfo := fmt.Sprintf("%s mm   f %s   %s s   ISO %s", focalLength, fNumber, exposureTime, iso)
-	addTextToImage(dc, exposeInfo, float64(newWidth), float64(newHeight)-float64(borderHeight)*3/5, 1, SFCompactItalicFontPath, float64(borderHeight)*0.23, 1)
+	addTextToImage(dc, exposeInfo, float64(newWidth), float64(newHeight)-float64(borderHeight)*3/5, 1, SFCompactItalicFontPath, float64(borderHeight)*0.25, 0)
 	// ----------------------------
 
 	// 添加拍摄时间
 	shotTime, _ := exifData["DateTimeOriginal"].(string)
-	addTextToImage(dc, shotTime, float64(newWidth), float64(newHeight)-float64(borderHeight)/4, 1, NewYorkFontPath, float64(borderHeight)*0.23, 0)
+	addTextToImage(dc, shotTime, float64(newWidth), float64(newHeight)-float64(borderHeight)/5, 1, NewYorkFontPath, float64(borderHeight)*0.25, 0)
 	// ----------------------------
 
 	// 添加Logo
@@ -159,12 +162,12 @@ func addWhiteBorderWithText(imgPath, outputPath string) error {
 	// 添加设备信息
 	makeInfo, model := exifData["Make"].(string), exifData["Model"].(string)
 	deviceInfo := fmt.Sprintf("%s    %s", makeInfo, model)
-	addTextToImage(dc, deviceInfo, logoWidth+50, float64(newHeight)-float64(borderHeight)*3/5, 0, SFCompactItalicFontPath, float64(borderHeight)*0.23, 1)
+	addTextToImage(dc, deviceInfo, logoWidth+50, float64(newHeight)-float64(borderHeight)*3/5, 0, SFCompactItalicFontPath, float64(borderHeight)*0.25, 0)
 	// ----------------------------
 
 	// 添加镜头信息
 	lens := exifData["LensModel"].(string)
-	addTextToImage(dc, lens, logoWidth+50, float64(newHeight)-float64(borderHeight)*1/4, 0, SFCompactItalicFontPath, float64(borderHeight)*0.23, 0)
+	addTextToImage(dc, lens, logoWidth+50, float64(newHeight)-float64(borderHeight)*1/5, 0, SFCompactItalicFontPath, float64(borderHeight)*0.25, 0)
 	// ----------------------------
 
 	outFile, err := os.Create(outputPath)
@@ -176,10 +179,62 @@ func addWhiteBorderWithText(imgPath, outputPath string) error {
 	return jpeg.Encode(outFile, dc.Image(), &jpeg.Options{Quality: 100})
 }
 
+func addWhiteBorderWithTextWrapper(imagePath, outputPath string) error {
+	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+		err := os.Mkdir(outputPath, os.ModePerm)
+		if err != nil {
+			fmt.Println("Error creating directory:", err)
+			return err
+		}
+	}
+
+	fileInfo, err := os.Stat(imagePath)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return err
+	}
+
+	if fileInfo.IsDir() {
+		files, err := os.ReadDir(imagePath)
+		if err != nil {
+			fmt.Println("Error reading directory:", err)
+			return err
+		}
+
+		for _, file := range files {
+			if file.IsDir() {
+				err := addWhiteBorderWithTextWrapper(filepath.Join(imagePath, file.Name()), filepath.Join(outputPath, file.Name()))
+				if err != nil {
+					return err
+				}
+			}
+
+			if strings.HasSuffix(file.Name(), ".jpg") || strings.HasSuffix(file.Name(), ".png") {
+				addWhiteBorderWithText(filepath.Join(imagePath, file.Name()), filepath.Join(outputPath, file.Name()))
+			}
+		}
+	} else if fileInfo.Mode().IsRegular() {
+		outputFilePath := filepath.Join(filepath.Dir(outputPath), fileInfo.Name())
+		if _, err := os.Stat(outputPath); os.IsNotExist(err) {
+			err := os.Mkdir(outputPath, os.ModePerm)
+			if err != nil {
+				fmt.Println("Error creating directory:", err)
+				return err
+			}
+		}
+		addWhiteBorderWithText(imagePath, outputFilePath)
+	} else {
+		fmt.Println("Error: File not found")
+	}
+
+	return nil
+}
+
 func main() {
-	imagePath := "/Users/wangqi/Desktop/2.35/P1056538.jpg"
-	outputPath := "/Users/wangqi/Desktop/2.35/P1056538xx.jpg"
-	if err := addWhiteBorderWithText(imagePath, outputPath); err != nil {
+
+	imagePath := "/Users/wangqi/Desktop/2.35"
+	outputPath := "/Users/wangqi/Desktop/tt"
+	if err := addWhiteBorderWithTextWrapper(imagePath, outputPath); err != nil {
 		fmt.Println("Error:", err)
 	} else {
 		fmt.Println("Image saved to:", outputPath)
