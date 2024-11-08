@@ -11,7 +11,6 @@ import (
 	"image/draw"
 	"image/jpeg"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -241,7 +240,8 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 		}
 		logo, err := gg.LoadImage(logoPath)
 		if err != nil {
-			log.Fatalf("无法加载 logo 图片: %v", err)
+			fmt.Println("可能是因为Exif存储相机厂商未预制, 厂商：", exifData["Make"])
+			fmt.Println("无法加载 logo 图片: ", err)
 			return err
 		}
 
@@ -251,7 +251,7 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 		} else {
 			logoResize, err = strconv.ParseFloat(logoConfig.Resize, 64)
 			if err != nil {
-				log.Fatalf("Logo 缩放配置异常: %v", err)
+				fmt.Println("Logo 缩放配置异常:", err)
 				return err
 			}
 		}
