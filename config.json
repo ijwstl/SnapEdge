@@ -1,0 +1,37 @@
+{
+  "imagePath": "/Users/wangqi/Desktop/2.35",
+  "outputPath": "/Users/wangqi/Desktop/tt",
+  "logo": {
+    "on": false,
+    "filePath": "default",
+    "resize": "auto"
+  },
+  "upperLeft": {
+    "on": true,
+    "text": "default",
+    "fontPath": "default",
+    "fontSize": "auto",
+    "bold": 0
+  },
+  "lowerLeft": {
+    "on": true,
+    "text": "default",
+    "fontPath": "default",
+    "fontSize": "auto",
+    "bold": 0
+  },
+  "upperRight": {
+    "on": true,
+    "text": "default",
+    "fontPath": "default",
+    "fontSize": "auto",
+    "bold": 0
+  },
+  "lowerRight": {
+    "on": true,
+    "text": "default",
+    "fontPath": "default",
+    "fontSize": "auto",
+    "bold": 0
+  }
+}
