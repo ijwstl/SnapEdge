@@ -1,4 +1,4 @@
-一个给照片添加水印的简单脚本
+一个给照片添加边框的简单脚本
 
 看下效果
 
@@ -8,11 +8,19 @@
 ![P1056494 23 47 57](https://github.com/user-attachments/assets/94e8360c-9fc1-43bd-981b-bf38700997bf)
 
 
-使用方法很简单，修改配置文件后运行脚本即可
+使用方法很简单，修改配置文件后运行对应系统的脚本即可
+
+```json
+[SnapEdge-mac-arm](SnapEdge-mac-arm)        macos m系列芯片
+[SnapEdge-mac-x86](SnapEdge-mac-x86)        macos 英特尔芯片
+[SnapEdge-win-32.exe](SnapEdge-win-32.exe)  windows 32位系统
+[SnapEdge-win-64.exe](SnapEdge-win-64.exe)  windows 64位系统
+```
 
 下面介绍配置文件内容含义
 
 
+```json
 {
   "imagePath": "/Users/wangqi/Desktop/2.35",      // 待处理照片文件地址
   "outputPath": "/Users/wangqi/Desktop/tt",       // 处理后文件存储地址
@@ -52,3 +60,4 @@
     "bold": 0                                     // 加粗细数，0代表不加粗，设置值为正整数
   }
 }
+```
