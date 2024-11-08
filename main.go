@@ -20,6 +20,12 @@ import (
 	"time"
 )
 
+/*
+	creator: ijwstl
+	bilibili: https://space.bilibili.com/352927833  KillNullPointer
+	email: ijwstl.coder@outlook.com
+*/
+
 type Logo struct {
 	On       bool   `json:"on"`
 	FilePath string `json:"filePath"`
@@ -35,13 +41,15 @@ type Text struct {
 }
 
 type Config struct {
-	ImagePath  string `json:"imagePath"`
-	OutputPath string `json:"outputPath"`
-	Logo       Logo   `json:"logo"`
-	UpperLeft  Text   `json:"upperLeft"`
-	LowerLeft  Text   `json:"lowerLeft"`
-	UpperRight Text   `json:"upperRight"`
-	LowerRight Text   `json:"lowerRight"`
+	ImagePath   string  `json:"imagePath"`
+	OutputPath  string  `json:"outputPath"`
+	Quality     int     `json:"quality"`
+	BorderWidth float64 `json:"borderWidth"`
+	Logo        Logo    `json:"logo"`
+	UpperLeft   Text    `json:"upperLeft"`
+	LowerLeft   Text    `json:"lowerLeft"`
+	UpperRight  Text    `json:"upperRight"`
+	LowerRight  Text    `json:"lowerRight"`
 }
 
 func getExifData(imgPath string) (map[string]interface{}, error) {
@@ -148,7 +156,7 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 		return err
 	}
 
-	borderHeight := int(float64(img.Bounds().Dy()) * 0.07)
+	borderHeight := int(float64(img.Bounds().Dy()) * config.BorderWidth)
 	newHeight := img.Bounds().Dy() + borderHeight
 	newWidth := img.Bounds().Dx()
 
@@ -323,7 +331,7 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 	}
 	defer outFile.Close()
 
-	return jpeg.Encode(outFile, dc.Image(), &jpeg.Options{Quality: 100})
+	return jpeg.Encode(outFile, dc.Image(), &jpeg.Options{Quality: config.Quality})
 }
 
 func addWhiteBorderWithTextWrapper(imagePath, outputPath string, config Config) error {
