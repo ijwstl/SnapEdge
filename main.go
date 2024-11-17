@@ -10,7 +10,6 @@ import (
 	"image/color"
 	"image/draw"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -386,15 +385,8 @@ func addWhiteBorderWithTextWrapper(imagePath, outputPath string, config Config) 
 }
 
 func readConfig() (Config, error) {
-	file, err := os.Open("config.json")
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return Config{}, err
-	}
-	defer file.Close()
-
 	// 读取文件内容
-	bytes, err := ioutil.ReadAll(file)
+	bytes, err := os.ReadFile("config.json")
 	if err != nil {
 		fmt.Println("Error reading file:", err)
 		return Config{}, err
@@ -402,6 +394,7 @@ func readConfig() (Config, error) {
 
 	// 解析JSON
 	var config Config
+
 	if err := json.Unmarshal(bytes, &config); err != nil {
 		fmt.Println("Error parsing JSON:", err)
 		return Config{}, err

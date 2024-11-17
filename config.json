@@ -1,10 +1,10 @@
 {
   "imagePath": "/Users/wangqi/Desktop/2.35",
   "outputPath": "/Users/wangqi/Desktop/tt",
-  "quality": 100,
+  "quality": 40,
   "borderWidth": 0.07,
   "logo": {
-    "on": false,
+    "on": true,
     "filePath": "default",
     "resize": "auto"
   },

@@ -184,7 +184,7 @@ def main(image_path, output_path=None):
             main(os.path.join(image_path, picture), output_path=None)
     elif os.path.isfile(image_path):
         if output_path is None:
-            tmp_path = os.path.join(os.path.dirname(image_path), "tmp");
+            tmp_path = os.path.join(os.path.dirname(image_path), "tmp")
             if not os.path.exists(tmp_path):
                 os.mkdir(tmp_path)
             output_path = os.path.join(tmp_path, os.path.basename(image_path))
