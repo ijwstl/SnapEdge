@@ -2,10 +2,8 @@
 
 看下效果
 
-![P1056510](https://github.com/user-attachments/assets/2120827a-7fee-4433-b5b0-d70ee192c53f)
+![P1056669](https://github.com/user-attachments/assets/0f8c7107-3f2a-49ed-913e-6b2cb6cb91b6)
 
-
-![P1056494 23 47 57](https://github.com/user-attachments/assets/94e8360c-9fc1-43bd-981b-bf38700997bf)
 
 
 使用方法很简单，修改配置文件后运行对应系统的脚本即可
