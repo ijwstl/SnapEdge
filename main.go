@@ -19,10 +19,17 @@ import (
 )
 
 /*
-	creator: ijwstl
-	bilibili: https://space.bilibili.com/352927833  KillNullPointer
-	email: ijwstl.coder@outlook.com
+creator: ijwstl
+bilibili: https://space.bilibili.com/352927833  KillNullPointer
+email: ijwstl.coder@outlook.com
 */
+const (
+	BOTTOM string = "bottom"
+	TOP    string = "top"
+	LEFT   string = "left"
+	RIGHT  string = "right"
+	ALL    string = "all"
+)
 
 type Logo struct {
 	On       bool   `json:"on"`
@@ -38,16 +45,24 @@ type Text struct {
 	Bold     int    `json:"bold"`
 }
 
+type Border struct {
+	BorderWidth        float64 `json:"borderWidth"`
+	BorderBottomHeight float64 `json:"borderBottomHeight"`
+	BorderTopHeight    float64 `json:"borderTopHeight"`
+	BorderLocation     string  `json:"borderLocation"`
+	BorderColor        string  `json:"borderColor"`
+}
+
 type Config struct {
-	ImagePath   string  `json:"imagePath"`
-	OutputPath  string  `json:"outputPath"`
-	Quality     int     `json:"quality"`
-	BorderWidth float64 `json:"borderWidth"`
-	Logo        Logo    `json:"logo"`
-	UpperLeft   Text    `json:"upperLeft"`
-	LowerLeft   Text    `json:"lowerLeft"`
-	UpperRight  Text    `json:"upperRight"`
-	LowerRight  Text    `json:"lowerRight"`
+	ImagePath  string `json:"imagePath"`
+	OutputPath string `json:"outputPath"`
+	Quality    int    `json:"quality"`
+	Border     Border `json:"border"`
+	Logo       Logo   `json:"logo"`
+	UpperLeft  Text   `json:"upperLeft"`
+	LowerLeft  Text   `json:"lowerLeft"`
+	UpperRight Text   `json:"upperRight"`
+	LowerRight Text   `json:"lowerRight"`
 }
 
 func getExifData(imgPath string) (map[string]interface{}, error) {
@@ -154,14 +169,57 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 		return err
 	}
 
-	borderHeight := int(float64(img.Bounds().Dy()) * config.BorderWidth)
-	newHeight := img.Bounds().Dy() + borderHeight
-	newWidth := img.Bounds().Dx()
+	var newHeight, newWidth, borderTopHeight, borderBottomHeight, borderWidth int
+	var border *image.RGBA
 
-	// 创建带白色边框的图像
-	border := image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
-	draw.Draw(border, border.Bounds(), &image.Uniform{color.White}, image.Point{}, draw.Src)
-	draw.Draw(border, img.Bounds(), img, image.Point{}, draw.Over)
+	switch config.Border.BorderLocation {
+	case TOP:
+		borderTopHeight = int(float64(img.Bounds().Dy()) * config.Border.BorderTopHeight)
+		newHeight = img.Bounds().Dy() + borderTopHeight
+		newWidth = img.Bounds().Dx()
+
+		border = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+		draw.Draw(border, border.Bounds(), &image.Uniform{color.White}, image.Point{}, draw.Src)
+		draw.Draw(border, image.Rect(0, borderTopHeight, newWidth, newHeight), img, image.Point{0, 0}, draw.Over)
+	case LEFT:
+		borderWidth = int(float64(img.Bounds().Dx()) * config.Border.BorderWidth)
+		newHeight = img.Bounds().Dy()
+		newWidth = img.Bounds().Dx() + borderWidth
+		border = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+		draw.Draw(border, border.Bounds(), &image.Uniform{color.White}, image.Point{}, draw.Src)
+		//draw.Draw(border, img.Bounds(), img, image.Point{borderWidth, 0}, draw.Over)
+		draw.Draw(border, image.Rect(borderWidth, 0, newWidth, newHeight), img, image.Point{0, 0}, draw.Src)
+	case RIGHT:
+		borderWidth = int(float64(img.Bounds().Dx()) * config.Border.BorderWidth)
+		newHeight = img.Bounds().Dy()
+		newWidth = img.Bounds().Dx() + borderWidth
+		border = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+		draw.Draw(border, border.Bounds(), &image.Uniform{color.White}, image.Point{}, draw.Src)
+		draw.Draw(border, img.Bounds(), img, image.Point{0, 0}, draw.Src)
+	case BOTTOM:
+		borderBottomHeight = int(float64(img.Bounds().Dy()) * config.Border.BorderBottomHeight)
+		newHeight = img.Bounds().Dy() + borderBottomHeight
+		newWidth = img.Bounds().Dx()
+		border = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+		draw.Draw(border, border.Bounds(), &image.Uniform{color.White}, image.Point{}, draw.Src)
+		draw.Draw(border, img.Bounds(), img, image.Point{}, draw.Over)
+	case ALL:
+		borderTopHeight = int(float64(img.Bounds().Dy()) * config.Border.BorderTopHeight)
+		borderBottomHeight = int(float64(img.Bounds().Dy()) * config.Border.BorderBottomHeight)
+		borderWidth = int(float64(img.Bounds().Dx()) * config.Border.BorderWidth)
+		newHeight = img.Bounds().Dy() + borderTopHeight + borderBottomHeight
+		newWidth = img.Bounds().Dx() + borderWidth*2
+		border = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+		draw.Draw(border, border.Bounds(), &image.Uniform{color.White}, image.Point{}, draw.Src)
+		draw.Draw(border, image.Rect(borderWidth, borderTopHeight, newWidth, newHeight), img, image.Point{0, 0}, draw.Over)
+	default:
+		borderBottomHeight = int(float64(img.Bounds().Dy()) * config.Border.BorderBottomHeight)
+		newHeight = img.Bounds().Dy() + borderBottomHeight
+		newWidth = img.Bounds().Dx()
+		border = image.NewRGBA(image.Rect(0, 0, newWidth, newHeight))
+		draw.Draw(border, border.Bounds(), &image.Uniform{color.White}, image.Point{}, draw.Src)
+		draw.Draw(border, img.Bounds(), img, image.Point{}, draw.Over)
+	}
 
 	dc := gg.NewContextForImage(border)
 
@@ -186,12 +244,12 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 
 		var upperRightFontSize float64
 		if upperRightConfig.FontSize == "auto" {
-			upperRightFontSize = float64(borderHeight) * 0.25
+			upperRightFontSize = float64(borderBottomHeight) * 0.25
 		} else {
 			upperRightFontSize, _ = strconv.ParseFloat(upperRightConfig.FontSize, 64)
 		}
 
-		addTextToImage(dc, upperRightText, float64(newWidth), float64(newHeight)-float64(borderHeight)*3/5, 1, upperRightTextFont, upperRightFontSize, upperRightConfig.Bold)
+		addTextToImage(dc, upperRightText, float64(img.Bounds().Dx()+borderWidth), float64(newHeight)-float64(borderBottomHeight)*3/5, 1, upperRightTextFont, upperRightFontSize, upperRightConfig.Bold)
 	}
 
 	// ----------------------------
@@ -216,12 +274,12 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 
 		var lowerRightFontSize float64
 		if lowerRightConfig.FontSize == "auto" {
-			lowerRightFontSize = float64(borderHeight) * 0.25
+			lowerRightFontSize = float64(borderBottomHeight) * 0.25
 		} else {
 			lowerRightFontSize, _ = strconv.ParseFloat(lowerRightConfig.FontSize, 64)
 		}
 
-		addTextToImage(dc, lowerRightText, float64(newWidth), float64(newHeight)-float64(borderHeight)/5, 1, lowerRightTextFont, lowerRightFontSize, lowerRightConfig.Bold)
+		addTextToImage(dc, lowerRightText, float64(img.Bounds().Dx()+borderWidth), float64(newHeight)-float64(borderBottomHeight)/5, 1, lowerRightTextFont, lowerRightFontSize, lowerRightConfig.Bold)
 	}
 
 	// ----------------------------
@@ -254,11 +312,11 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 				return err
 			}
 		}
-		logo = resizeImage(logo, logo.Bounds().Dx()*int(float64(borderHeight)*logoResize)/logo.Bounds().Dy(), int(float64(borderHeight)*logoResize))
+		logo = resizeImage(logo, logo.Bounds().Dx()*int(float64(borderBottomHeight)*logoResize)/logo.Bounds().Dy(), int(float64(borderBottomHeight)*logoResize))
 
 		logoWidth = float64(logo.Bounds().Dx())
 
-		addLogo(dc, logo, 0, float64(newHeight)-(float64(borderHeight)*(1-(1-logoResize)/2)))
+		addLogo(dc, logo, 0, float64(newHeight)-(float64(borderBottomHeight)*(1-(1-logoResize)/2)))
 	}
 
 	// ----------------------------
@@ -284,12 +342,16 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 
 		var upperLeftFontSize float64
 		if upperLeftConfig.FontSize == "auto" {
-			upperLeftFontSize = float64(borderHeight) * 0.25
+			upperLeftFontSize = float64(borderBottomHeight) * 0.25
 		} else {
 			upperLeftFontSize, _ = strconv.ParseFloat(upperLeftConfig.FontSize, 64)
 		}
 
-		addTextToImage(dc, upperLeftText, logoWidth+50, float64(newHeight)-float64(borderHeight)*3/5, 0, upperLeftTextFont, upperLeftFontSize, upperLeftConfig.Bold)
+		if logoWidth == 0 {
+			logoWidth = float64(borderWidth)
+		}
+
+		addTextToImage(dc, upperLeftText, logoWidth+50, float64(newHeight)-float64(borderBottomHeight)*3/5, 0, upperLeftTextFont, upperLeftFontSize, upperLeftConfig.Bold)
 	}
 
 	// ----------------------------
@@ -314,12 +376,16 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 
 		var lowerLeftFontSize float64
 		if lowerLeftConfig.FontSize == "auto" {
-			lowerLeftFontSize = float64(borderHeight) * 0.25
+			lowerLeftFontSize = float64(borderBottomHeight) * 0.25
 		} else {
 			lowerLeftFontSize, _ = strconv.ParseFloat(lowerLeftConfig.FontSize, 64)
 		}
 
-		addTextToImage(dc, lowerLeftText, logoWidth+50, float64(newHeight)-float64(borderHeight)*1/5, 0, lowerLeftTextFont, lowerLeftFontSize, lowerLeftConfig.Bold)
+		if logoWidth == 0 {
+			logoWidth = float64(borderWidth)
+		}
+
+		addTextToImage(dc, lowerLeftText, logoWidth+50, float64(newHeight)-float64(borderBottomHeight)*1/5, 0, lowerLeftTextFont, lowerLeftFontSize, lowerLeftConfig.Bold)
 	}
 
 	// ----------------------------
@@ -368,7 +434,7 @@ func addWhiteBorderWithTextWrapper(imagePath, outputPath string, config Config) 
 			}
 		}
 	} else if fileInfo.Mode().IsRegular() {
-		outputFilePath := filepath.Join(filepath.Dir(outputPath), fileInfo.Name())
+		outputFilePath := filepath.Join(outputPath, fileInfo.Name())
 		if _, err := os.Stat(outputPath); os.IsNotExist(err) {
 			err := os.Mkdir(outputPath, os.ModePerm)
 			if err != nil {

@@ -1,10 +1,16 @@
 {
-  "imagePath": "/Users/wangqi/Desktop/2.35",
-  "outputPath": "/Users/wangqi/Desktop/tt",
+  "imagePath": "/Users/wangqi/Desktop/dd",
+  "outputPath": "/Users/wangqi/Desktop/buf",
   "quality": 40,
-  "borderWidth": 0.07,
+  "border": {
+    "borderWidth": 0.01,
+    "borderBottomHeight": 0.07,
+    "borderTopHeight": 0.01,
+    "borderLocation": "all",
+    "borderColor": "all"
+  },
   "logo": {
-    "on": true,
+    "on": false,
     "filePath": "default",
     "resize": "auto"
   },

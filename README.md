@@ -25,7 +25,13 @@
   "imagePath": "/Users/wangqi/Desktop/2.35",      // 待处理照片文件地址
   "outputPath": "/Users/wangqi/Desktop/tt",       // 处理后文件存储地址
   "quality": 100,                                 // 文件输出质量，0-100
-  "borderWidth": 0.07,                            // 下边框宽度占比，默认0.07，如果是纵向构图建议0.04
+  "border": {                                     // 边框配置
+    "borderWidth": 0.01,                          // 左右边框宽度
+    "borderBottomHeight": 0.07,                   // 下边框宽度
+    "borderTopHeight": 0.01,                      // 上边框宽度
+    "borderLocation": "all",                      // 边框位置  all、 top、 bottom、 left、 right
+    "borderColor": "all"                          // 边框颜色
+  },
   "logo": {                                       // logo配置
     "on": false,                                  // 是否开启logo展示
     "filePath": "default",                        // logo地址，默认default为根据相机厂商进行展示
