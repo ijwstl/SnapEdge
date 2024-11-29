@@ -2,8 +2,7 @@
 
 看下效果
 
-![P1056669](https://github.com/user-attachments/assets/0f8c7107-3f2a-49ed-913e-6b2cb6cb91b6)
-
+![Screenshot-2024-11-29-at-22 25 37](https://github.com/user-attachments/assets/7a033da3-653a-4c16-bc04-e17216c4f6f4)
 
 
 使用方法很简单，修改配置文件后运行对应系统的脚本即可
