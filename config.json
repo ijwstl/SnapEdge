@@ -2,6 +2,7 @@
   "imagePath": "/Users/wangqi/Desktop/dd",
   "outputPath": "/Users/wangqi/Desktop/buf",
   "quality": 40,
+  "taskMax": 50,
   "border": {
     "borderWidth": 0.015,
     "borderBottomHeight": 0.07,
@@ -14,32 +15,38 @@
     "filePath": "default",
     "resize": "auto"
   },
-  "upperLeft": {
-    "on": true,
-    "text": "default",
-    "fontPath": "default",
-    "fontSize": "auto",
-    "bold": 0
-  },
-  "lowerLeft": {
-    "on": true,
-    "text": "default",
-    "fontPath": "default",
-    "fontSize": "auto",
-    "bold": 0
-  },
-  "upperRight": {
-    "on": true,
-    "text": "default",
-    "fontPath": "default",
-    "fontSize": "auto",
-    "bold": 0
-  },
-  "lowerRight": {
-    "on": true,
-    "text": "default",
-    "fontPath": "default",
-    "fontSize": "auto",
-    "bold": 0
-  }
+  "text": [
+    {
+      "on": true,
+      "text": "default",
+      "fontPath": "default",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "UpperLeft"
+    },
+    {
+      "on": true,
+      "text": "default",
+      "fontPath": "default",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "LowerLeft"
+    },
+    {
+      "on": true,
+      "text": "default",
+      "fontPath": "default",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "UpperRight"
+    },
+    {
+      "on": true,
+      "text": "default",
+      "fontPath": "default",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "LowerRight"
+    }
+  ]
 }

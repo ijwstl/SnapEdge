@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -43,6 +44,7 @@ type Text struct {
 	FontPath string `json:"fontPath"`
 	FontSize string `json:"fontSize"`
 	Bold     int    `json:"bold"`
+	Location string `json:"location"`
 }
 
 type Border struct {
@@ -57,12 +59,15 @@ type Config struct {
 	ImagePath  string `json:"imagePath"`
 	OutputPath string `json:"outputPath"`
 	Quality    int    `json:"quality"`
+	TaskMax    int    `json:"taskMax"`
 	Border     Border `json:"border"`
 	Logo       Logo   `json:"logo"`
-	UpperLeft  Text   `json:"upperLeft"`
-	LowerLeft  Text   `json:"lowerLeft"`
-	UpperRight Text   `json:"upperRight"`
-	LowerRight Text   `json:"lowerRight"`
+	Text       []Text `json:"text"`
+}
+
+type Task struct {
+	FilePath    string
+	OutFilePath string
 }
 
 func getExifData(imgPath string) (map[string]interface{}, error) {
@@ -223,67 +228,6 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 
 	dc := gg.NewContextForImage(border)
 
-	// 添加曝光信息
-	upperRightConfig := config.UpperRight
-
-	if upperRightConfig.On {
-		var upperRightText string
-		if upperRightConfig.Text == "default" {
-			focalLength, fNumber, exposureTime, iso := exifData["FocalLength"].(string), exifData["FNumber"].(string), exifData["ExposureTime"].(string), exifData["ISOSpeedRatings"].(string)
-			upperRightText = fmt.Sprintf("%s mm   f %s   %s s   ISO %s", focalLength, fNumber, exposureTime, iso)
-		} else {
-			upperRightText = upperRightConfig.Text
-		}
-
-		var upperRightTextFont string
-		if upperRightConfig.FontPath == "default" {
-			upperRightTextFont = path.Join(basePath, "font", "SFCompactItalic.ttf")
-		} else {
-			upperRightTextFont = upperRightConfig.FontPath
-		}
-
-		var upperRightFontSize float64
-		if upperRightConfig.FontSize == "auto" {
-			upperRightFontSize = float64(borderBottomHeight) * 0.25
-		} else {
-			upperRightFontSize, _ = strconv.ParseFloat(upperRightConfig.FontSize, 64)
-		}
-
-		addTextToImage(dc, upperRightText, float64(img.Bounds().Dx()+borderWidth), float64(newHeight)-float64(borderBottomHeight)*3/5, 1, upperRightTextFont, upperRightFontSize, upperRightConfig.Bold)
-	}
-
-	// ----------------------------
-
-	// 添加拍摄时间
-	lowerRightConfig := config.LowerRight
-
-	if lowerRightConfig.On {
-		var lowerRightText string
-		if lowerRightConfig.Text == "default" {
-			lowerRightText = exifData["DateTimeOriginal"].(string)
-		} else {
-			lowerRightText = lowerRightConfig.Text
-		}
-
-		var lowerRightTextFont string
-		if lowerRightConfig.FontPath == "default" {
-			lowerRightTextFont = path.Join(basePath, "font", "SFCamera.ttf")
-		} else {
-			lowerRightTextFont = lowerRightConfig.FontPath
-		}
-
-		var lowerRightFontSize float64
-		if lowerRightConfig.FontSize == "auto" {
-			lowerRightFontSize = float64(borderBottomHeight) * 0.25
-		} else {
-			lowerRightFontSize, _ = strconv.ParseFloat(lowerRightConfig.FontSize, 64)
-		}
-
-		addTextToImage(dc, lowerRightText, float64(img.Bounds().Dx()+borderWidth), float64(newHeight)-float64(borderBottomHeight)/5, 1, lowerRightTextFont, lowerRightFontSize, lowerRightConfig.Bold)
-	}
-
-	// ----------------------------
-
 	// 添加Logo
 	logoConfig := config.Logo
 	var logoWidth float64 = 0
@@ -319,73 +263,119 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 		addLogo(dc, logo, 0, float64(newHeight)-(float64(borderBottomHeight)*(1-(1-logoResize)/2)))
 	}
 
-	// ----------------------------
+	textList := config.Text
+	for _, text := range textList {
+		if text.Location == "UpperRight" && text.On {
+			// 添加曝光信息
+			upperRightConfig := text
+			var upperRightText string
+			if upperRightConfig.Text == "default" {
+				focalLength, fNumber, exposureTime, iso := exifData["FocalLength"].(string), exifData["FNumber"].(string), exifData["ExposureTime"].(string), exifData["ISOSpeedRatings"].(string)
+				upperRightText = fmt.Sprintf("%s mm   f %s   %s s   ISO %s", focalLength, fNumber, exposureTime, iso)
+			} else {
+				upperRightText = upperRightConfig.Text
+			}
 
-	// 添加设备信息
-	upperLeftConfig := config.UpperLeft
+			var upperRightTextFont string
+			if upperRightConfig.FontPath == "default" {
+				upperRightTextFont = path.Join(basePath, "font", "SFCompactItalic.ttf")
+			} else {
+				upperRightTextFont = upperRightConfig.FontPath
+			}
 
-	if upperLeftConfig.On {
-		var upperLeftText string
-		if upperLeftConfig.Text == "default" {
-			makeInfo, model := exifData["Make"].(string), exifData["Model"].(string)
-			upperLeftText = fmt.Sprintf("%s    %s", makeInfo, model)
-		} else {
-			upperLeftText = upperLeftConfig.Text
+			var upperRightFontSize float64
+			if upperRightConfig.FontSize == "auto" {
+				upperRightFontSize = float64(borderBottomHeight) * 0.25
+			} else {
+				upperRightFontSize, _ = strconv.ParseFloat(upperRightConfig.FontSize, 64)
+			}
+
+			addTextToImage(dc, upperRightText, float64(img.Bounds().Dx()+borderWidth), float64(newHeight)-float64(borderBottomHeight)*3/5, 1, upperRightTextFont, upperRightFontSize, upperRightConfig.Bold)
+		} else if text.Location == "LowerRight" && text.On {
+			// 添加拍摄时间
+			lowerRightConfig := text
+			var lowerRightText string
+			if lowerRightConfig.Text == "default" {
+				lowerRightText = exifData["DateTimeOriginal"].(string)
+			} else {
+				lowerRightText = lowerRightConfig.Text
+			}
+
+			var lowerRightTextFont string
+			if lowerRightConfig.FontPath == "default" {
+				lowerRightTextFont = path.Join(basePath, "font", "SFCamera.ttf")
+			} else {
+				lowerRightTextFont = lowerRightConfig.FontPath
+			}
+
+			var lowerRightFontSize float64
+			if lowerRightConfig.FontSize == "auto" {
+				lowerRightFontSize = float64(borderBottomHeight) * 0.25
+			} else {
+				lowerRightFontSize, _ = strconv.ParseFloat(lowerRightConfig.FontSize, 64)
+			}
+
+			addTextToImage(dc, lowerRightText, float64(img.Bounds().Dx()+borderWidth), float64(newHeight)-float64(borderBottomHeight)/5, 1, lowerRightTextFont, lowerRightFontSize, lowerRightConfig.Bold)
+		} else if text.Location == "UpperLeft" && text.On {
+			// 添加设备信息
+			upperLeftConfig := text
+			var upperLeftText string
+			if upperLeftConfig.Text == "default" {
+				makeInfo, model := exifData["Make"].(string), exifData["Model"].(string)
+				upperLeftText = fmt.Sprintf("%s    %s", makeInfo, model)
+			} else {
+				upperLeftText = upperLeftConfig.Text
+			}
+
+			var upperLeftTextFont string
+			if upperLeftConfig.FontPath == "default" {
+				upperLeftTextFont = path.Join(basePath, "font", "SFCompactItalic.ttf")
+			} else {
+				upperLeftTextFont = upperLeftConfig.FontPath
+			}
+
+			var upperLeftFontSize float64
+			if upperLeftConfig.FontSize == "auto" {
+				upperLeftFontSize = float64(borderBottomHeight) * 0.25
+			} else {
+				upperLeftFontSize, _ = strconv.ParseFloat(upperLeftConfig.FontSize, 64)
+			}
+
+			if logoWidth == 0 {
+				logoWidth = float64(borderWidth)
+			}
+
+			addTextToImage(dc, upperLeftText, logoWidth+50, float64(newHeight)-float64(borderBottomHeight)*3/5, 0, upperLeftTextFont, upperLeftFontSize, upperLeftConfig.Bold)
+		} else if text.Location == "LowerLeft" && text.On {
+			// 添加镜头信息
+			lowerLeftConfig := text
+			var lowerLeftText string
+			if lowerLeftConfig.Text == "default" {
+				lowerLeftText = exifData["LensModel"].(string)
+			} else {
+				lowerLeftText = lowerLeftConfig.Text
+			}
+
+			var lowerLeftTextFont string
+			if lowerLeftConfig.FontPath == "default" {
+				lowerLeftTextFont = path.Join(basePath, "font", "SFCompactItalic.ttf")
+			} else {
+				lowerLeftTextFont = lowerLeftConfig.FontPath
+			}
+
+			var lowerLeftFontSize float64
+			if lowerLeftConfig.FontSize == "auto" {
+				lowerLeftFontSize = float64(borderBottomHeight) * 0.25
+			} else {
+				lowerLeftFontSize, _ = strconv.ParseFloat(lowerLeftConfig.FontSize, 64)
+			}
+
+			if logoWidth == 0 {
+				logoWidth = float64(borderWidth)
+			}
+
+			addTextToImage(dc, lowerLeftText, logoWidth+50, float64(newHeight)-float64(borderBottomHeight)*1/5, 0, lowerLeftTextFont, lowerLeftFontSize, lowerLeftConfig.Bold)
 		}
-
-		var upperLeftTextFont string
-		if upperLeftConfig.FontPath == "default" {
-			upperLeftTextFont = path.Join(basePath, "font", "SFCompactItalic.ttf")
-		} else {
-			upperLeftTextFont = upperLeftConfig.FontPath
-		}
-
-		var upperLeftFontSize float64
-		if upperLeftConfig.FontSize == "auto" {
-			upperLeftFontSize = float64(borderBottomHeight) * 0.25
-		} else {
-			upperLeftFontSize, _ = strconv.ParseFloat(upperLeftConfig.FontSize, 64)
-		}
-
-		if logoWidth == 0 {
-			logoWidth = float64(borderWidth)
-		}
-
-		addTextToImage(dc, upperLeftText, logoWidth+50, float64(newHeight)-float64(borderBottomHeight)*3/5, 0, upperLeftTextFont, upperLeftFontSize, upperLeftConfig.Bold)
-	}
-
-	// ----------------------------
-
-	// 添加镜头信息
-	lowerLeftConfig := config.LowerLeft
-
-	if lowerLeftConfig.On {
-		var lowerLeftText string
-		if lowerLeftConfig.Text == "default" {
-			lowerLeftText = exifData["LensModel"].(string)
-		} else {
-			lowerLeftText = lowerLeftConfig.Text
-		}
-
-		var lowerLeftTextFont string
-		if lowerLeftConfig.FontPath == "default" {
-			lowerLeftTextFont = path.Join(basePath, "font", "SFCompactItalic.ttf")
-		} else {
-			lowerLeftTextFont = lowerLeftConfig.FontPath
-		}
-
-		var lowerLeftFontSize float64
-		if lowerLeftConfig.FontSize == "auto" {
-			lowerLeftFontSize = float64(borderBottomHeight) * 0.25
-		} else {
-			lowerLeftFontSize, _ = strconv.ParseFloat(lowerLeftConfig.FontSize, 64)
-		}
-
-		if logoWidth == 0 {
-			logoWidth = float64(borderWidth)
-		}
-
-		addTextToImage(dc, lowerLeftText, logoWidth+50, float64(newHeight)-float64(borderBottomHeight)*1/5, 0, lowerLeftTextFont, lowerLeftFontSize, lowerLeftConfig.Bold)
 	}
 
 	// ----------------------------
@@ -399,7 +389,7 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 	return jpeg.Encode(outFile, dc.Image(), &jpeg.Options{Quality: config.Quality})
 }
 
-func addWhiteBorderWithTextWrapper(imagePath, outputPath string, config Config) error {
+func addWhiteBorderWithTextWrapper(imagePath, outputPath string, wg *sync.WaitGroup, taskChannel *chan Task) error {
 	if _, err := os.Stat(outputPath); os.IsNotExist(err) {
 		err := os.Mkdir(outputPath, os.ModePerm)
 		if err != nil {
@@ -423,14 +413,15 @@ func addWhiteBorderWithTextWrapper(imagePath, outputPath string, config Config) 
 
 		for _, file := range files {
 			if file.IsDir() {
-				err := addWhiteBorderWithTextWrapper(filepath.Join(imagePath, file.Name()), filepath.Join(outputPath, file.Name()), config)
+				err := addWhiteBorderWithTextWrapper(filepath.Join(imagePath, file.Name()), filepath.Join(outputPath, file.Name()), wg, taskChannel)
 				if err != nil {
 					return err
 				}
 			}
 
 			if strings.HasSuffix(file.Name(), ".jpg") || strings.HasSuffix(file.Name(), ".png") {
-				addWhiteBorderWithText(filepath.Join(imagePath, file.Name()), filepath.Join(outputPath, file.Name()), config)
+				wg.Add(1)
+				*taskChannel <- Task{FilePath: filepath.Join(imagePath, file.Name()), OutFilePath: filepath.Join(outputPath, file.Name())}
 			}
 		}
 	} else if fileInfo.Mode().IsRegular() {
@@ -442,7 +433,8 @@ func addWhiteBorderWithTextWrapper(imagePath, outputPath string, config Config) 
 				return err
 			}
 		}
-		addWhiteBorderWithText(imagePath, outputFilePath, config)
+		wg.Add(1)
+		*taskChannel <- Task{FilePath: imagePath, OutFilePath: outputFilePath}
 	} else {
 		fmt.Println("Error: File not found")
 	}
@@ -477,9 +469,30 @@ func main() {
 
 	fmt.Println("Config info:", config)
 
-	if err := addWhiteBorderWithTextWrapper(config.ImagePath, config.OutputPath, config); err != nil {
+	var wg sync.WaitGroup
+
+	// 使用一个通道动态发送任务
+	taskChannel := make(chan Task, config.TaskMax)
+
+	go func() {
+		for task := range taskChannel {
+			go func(task Task) {
+				defer wg.Done() // Goroutine 完成后减少计数
+				err := addWhiteBorderWithText(task.FilePath, task.OutFilePath, config)
+				if err != nil {
+					return
+				}
+			}(task)
+		}
+	}()
+
+	if err := addWhiteBorderWithTextWrapper(config.ImagePath, config.OutputPath, &wg, &taskChannel); err != nil {
 		fmt.Println("Error:", err)
-	} else {
-		fmt.Println("Image saved to:", config.OutputPath)
 	}
+
+	close(taskChannel)
+
+	wg.Wait()
+
+	fmt.Println("Image saved to:", config.OutputPath)
 }
