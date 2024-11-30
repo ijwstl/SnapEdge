@@ -6,7 +6,7 @@
   "border": {
     "borderWidth": 0.015,
     "borderBottomHeight": 0.07,
-    "borderTopHeight": 0.02,
+    "borderTopHeight": 0.015,
     "borderLocation": "all",
     "borderColor": "all"
   },

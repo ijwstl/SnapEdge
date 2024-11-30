@@ -258,9 +258,9 @@ func addWhiteBorderWithText(imgPath, outputPath string, config Config) error {
 		}
 		logo = resizeImage(logo, logo.Bounds().Dx()*int(float64(borderBottomHeight)*logoResize)/logo.Bounds().Dy(), int(float64(borderBottomHeight)*logoResize))
 
-		logoWidth = float64(logo.Bounds().Dx())
+		logoWidth = float64(logo.Bounds().Dx()) + float64(borderWidth)
 
-		addLogo(dc, logo, 0, float64(newHeight)-(float64(borderBottomHeight)*(1-(1-logoResize)/2)))
+		addLogo(dc, logo, float64(borderWidth), float64(newHeight)-(float64(borderBottomHeight)*(1-(1-logoResize)/2)))
 	}
 
 	textList := config.Text
