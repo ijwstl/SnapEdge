@@ -18,35 +18,51 @@
   "text": [
     {
       "on": true,
-      "text": "default",
-      "fontPath": "default",
+      "text": "device",
+      "fontPath": "SFCompactItalic.ttf",
       "fontSize": "auto",
       "bold": 0,
       "location": "UpperLeft"
     },
     {
       "on": true,
-      "text": "default",
-      "fontPath": "default",
+      "text": "lens",
+      "fontPath": "SFCompactItalic.ttf",
       "fontSize": "auto",
       "bold": 0,
       "location": "LowerLeft"
     },
     {
       "on": true,
-      "text": "default",
-      "fontPath": "default",
+      "text": "expose",
+      "fontPath": "SFCompactItalic.ttf",
       "fontSize": "auto",
       "bold": 0,
       "location": "UpperRight"
     },
     {
       "on": true,
-      "text": "default",
-      "fontPath": "default",
+      "text": "time",
+      "fontPath": "SFCamera.ttf",
       "fontSize": "auto",
       "bold": 0,
       "location": "LowerRight"
+    },
+    {
+      "on": true,
+      "text": "这里是卢本伟广场",
+      "fontPath": "STHeiti Medium.ttc",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "LowerCenter"
+    },
+    {
+      "on": true,
+      "text": "耶呼",
+      "fontPath": "STHeiti Medium.ttc",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "UpperCenter"
     }
   ]
 }

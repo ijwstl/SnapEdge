@@ -38,35 +38,51 @@
   "text": [
     {
       "on": true,                                 // 是否开启
-      "text": "default",                          // 文字内容，根据location不同，会有不同的默认值，UpperLeft默认为厂商 + 相机型号
-      "fontPath": "default",                      // 字体文件地址，根据location不同，UpperLeft默认为SFCompactItalic字体
+      "text": "device",                           // 文字内容，默认有四种信息 【device、lens、expose、time】 device为设备信息
+      "fontPath": "SFCompactItalic.ttf",          // 字体文件地址，默认有四种内置字体【NewYork.ttf、SFCamera.ttf、SFCompactItalic.ttf、STHeiti Medium.ttc】
       "fontSize": "auto",                         // 字体大小，默认为下边框的25%
       "bold": 0,                                  // 加粗细数，0代表不加粗，设置值为正整数
-      "location": "UpperLeft"                     // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight和LowerRight
+      "location": "UpperLeft"                     // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight、LowerRight、UpperCenter和LowerCenter，这里为下边框左上角
     },
     {
       "on": true,                                 // 是否开启
-      "text": "default",                          // 文字内容，根据location不同，会有不同的默认值，LowerLeft默认为拍摄镜头信息
-      "fontPath": "default",                      // 字体文件地址，根据location不同，LowerLeft默认为SFCompactItalic字体
+      "text": "lens",                             // 文字内容，默认有四种信息 【device、lens、expose、time】 lens为镜头信息
+      "fontPath": "SFCompactItalic.ttf",          // 字体文件地址，默认有四种内置字体【NewYork.ttf、SFCamera.ttf、SFCompactItalic.ttf、STHeiti Medium.ttc】
       "fontSize": "auto",                         // 字体大小，默认为下边框的25%
       "bold": 0,                                  // 加粗细数，0代表不加粗，设置值为正整数
-      "location": "LowerLeft"                     // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight和LowerRight
+      "location": "LowerLeft"                     // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight、LowerRight、UpperCenter和LowerCenter，这里为下边框左下角
     },
     {
       "on": true,                                 // 是否开启
-      "text": "default",                          // 文字内容，根据location不同，会有不同的默认值，UpperRight默认为曝光参数
-      "fontPath": "default",                      // 字体文件地址，根据location不同，UpperRight默认为SFCompactItalic字体
+      "text": "expose",                           // 文字内容，默认有四种信息 【device、lens、expose、time】 expose为曝光参数
+      "fontPath": "SFCompactItalic.ttf",          // 字体文件地址，默认有四种内置字体【NewYork.ttf、SFCamera.ttf、SFCompactItalic.ttf、STHeiti Medium.ttc】
       "fontSize": "auto",                         // 字体大小，默认为下边框的25%
       "bold": 0,                                  // 加粗细数，0代表不加粗，设置值为正整数
-      "location": "UpperRight"                     // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight和LowerRight
+      "location": "UpperRight"                    // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight、LowerRight、UpperCenter和LowerCenter，这里为下边框右上角
     },
     {
       "on": true,                                 // 是否开启
-      "text": "default",                          // 文字内容，根据location不同，会有不同的默认值，LowerRight默认为拍摄时间
-      "fontPath": "default",                      // 字体文件地址，根据location不同，LowerRight默认为SFCamera字体
+      "text": "time",                             // 文字内容，默认有四种信息 【device、lens、expose、time】 time为拍摄时间
+      "fontPath": "SFCamera.ttf",                 // 字体文件地址，默认有四种内置字体【NewYork.ttf、SFCamera.ttf、SFCompactItalic.ttf、STHeiti Medium.ttc】
       "fontSize": "auto",                         // 字体大小，默认为下边框的25%
       "bold": 0,                                  // 加粗细数，0代表不加粗，设置值为正整数
-      "location": "LowerRight"                     // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight和LowerRight
+      "location": "LowerRight"                    // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight、LowerRight、UpperCenter和LowerCenter，这里为下边框右下角
+    },
+    {
+      "on": true,
+      "text": "这里是卢本伟广场",
+      "fontPath": "STHeiti Medium.ttc",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "LowerCenter"                   // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight、LowerRight、UpperCenter和LowerCenter，这里为下边框中下角
+    },
+    {
+      "on": true,
+      "text": "耶呼",
+      "fontPath": "STHeiti Medium.ttc",
+      "fontSize": "auto",
+      "bold": 0,
+      "location": "UpperCenter"                   // 文字位置，目前支持下边框的UpperLeft、LowerLeft、UpperRight、LowerRight、UpperCenter和LowerCenter，这里为下边框中上角
     }
   ]
 }
