@@ -1,6 +1,7 @@
 一个给照片添加边框的简单脚本
 
 看下效果
+<img width="2560" alt="Screenshot 2024-11-30 at 17 47 12" src="https://github.com/user-attachments/assets/55465727-686d-4254-b09c-dd5560f248f8">
 
 ![Screenshot-2024-11-29-at-22 25 37](https://github.com/user-attachments/assets/7a033da3-653a-4c16-bc04-e17216c4f6f4)
 
