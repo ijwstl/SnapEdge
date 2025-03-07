@@ -47,22 +47,6 @@
       "fontSize": "auto",
       "bold": 0,
       "location": "LowerRight"
-    },
-    {
-      "on": true,
-      "text": "这里是卢本伟广场",
-      "fontPath": "STHeiti Medium.ttc",
-      "fontSize": "auto",
-      "bold": 0,
-      "location": "LowerCenter"
-    },
-    {
-      "on": true,
-      "text": "耶呼",
-      "fontPath": "STHeiti Medium.ttc",
-      "fontSize": "auto",
-      "bold": 0,
-      "location": "UpperCenter"
     }
   ]
 }
